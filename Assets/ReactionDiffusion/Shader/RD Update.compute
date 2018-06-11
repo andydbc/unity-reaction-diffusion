@@ -1,0 +1,51 @@
+﻿#pragma kernel Init
+#pragma kernel Update
+
+float2 _Diffusion;
+float _Feed;
+float _Kill;
+
+Texture2D<float2> Read;
+RWTexture2D<float2> Write;
+
+float Random (float2 st) 
+{
+    return frac(sin(dot(st.xy, float2(12.9898,78.233)))* 43758.5453123);
+}
+
+[numthreads(8,8,1)]
+void Init (uint3 id : SV_DispatchThreadID)
+{
+	float rnd = Random(id.xy) + Random(id.xy + 1);
+	Write[id.xy] = float2(1,  step(rnd, 0.1));
+}
+
+float2 Sample(int2 pos) 
+{
+	return Read.Load(int4(pos, 0, 0));
+}
+
+[numthreads(8,8,1)]
+void Update (uint3 id : SV_DispatchThreadID)
+{
+	float2 pq = Sample(id.xy);
+
+	float4 d = float4(1, 1, -1, 0.0);
+	float2 q = -pq;
+				
+	q += Sample(id.xy - d.xy).xy * 0.05; // -1,-1
+	q += Sample(id.xy - d.wy).xy * 0.20; // 0, -1
+	q += Sample(id.xy - d.zy).xy * 0.05; // +1, -1
+	q += Sample(id.xy - d.xw).xy * 0.20; // -1, 0
+	q += Sample(id.xy + d.xw).xy * 0.20; // +1, 0
+	q += Sample(id.xy + d.zy).xy * 0.05; // -1, +1
+	q += Sample(id.xy + d.wy).xy * 0.20; // 0, +1
+	q += Sample(id.xy + d.xy).xy * 0.05; // +1, +1
+
+	float ABB = pq.x * pq.y * pq.y;
+	
+	float a = pq.x + (_Diffusion.x * q.x - ABB + _Feed * (1.0 - pq.x));
+	float b = pq.y + (_Diffusion.y * q.y + ABB - (_Kill + _Feed) * pq.y);
+
+	Write[id.xy] = float2(saturate(a), saturate(b));
+}
