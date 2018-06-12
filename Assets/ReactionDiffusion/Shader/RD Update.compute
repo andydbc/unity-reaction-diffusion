@@ -16,7 +16,7 @@ float Random (float2 st)
 [numthreads(8,8,1)]
 void Init (uint3 id : SV_DispatchThreadID)
 {
-	float rnd = Random(id.xy) + Random(id.xy + 1);
+	float rnd = Random(id.xy);
 	Write[id.xy] = float2(1,  step(rnd, 0.1));
 }
 
@@ -30,17 +30,17 @@ void Update (uint3 id : SV_DispatchThreadID)
 {
 	float2 pq = Sample(id.xy);
 
-	float4 d = float4(1, 1, -1, 0.0);
+	float3 d = float3(1, -1, 0.0);
 	float2 q = -pq;
 				
-	q += Sample(id.xy - d.xy).xy * 0.05; // -1,-1
-	q += Sample(id.xy - d.wy).xy * 0.20; // 0, -1
-	q += Sample(id.xy - d.zy).xy * 0.05; // +1, -1
-	q += Sample(id.xy - d.xw).xy * 0.20; // -1, 0
-	q += Sample(id.xy + d.xw).xy * 0.20; // +1, 0
-	q += Sample(id.xy + d.zy).xy * 0.05; // -1, +1
-	q += Sample(id.xy + d.wy).xy * 0.20; // 0, +1
-	q += Sample(id.xy + d.xy).xy * 0.05; // +1, +1
+	q += Sample(id.xy - d.xx).xy * 0.05; // -1,-1
+	q += Sample(id.xy - d.zx).xy * 0.20; // 0, -1
+	q += Sample(id.xy - d.zx).xy * 0.05; // +1, -1
+	q += Sample(id.xy - d.xz).xy * 0.20; // -1, 0
+	q += Sample(id.xy + d.xz).xy * 0.20; // +1, 0
+	q += Sample(id.xy + d.zx).xy * 0.05; // -1, +1
+	q += Sample(id.xy + d.zx).xy * 0.20; // 0, +1
+	q += Sample(id.xy + d.xx).xy * 0.05; // +1, +1
 
 	float ABB = pq.x * pq.y * pq.y;
 	
