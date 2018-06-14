@@ -35,10 +35,10 @@ void Update (uint3 id : SV_DispatchThreadID)
 				
 	q += Sample(id.xy - d.xx).xy * 0.05; // -1,-1
 	q += Sample(id.xy - d.zx).xy * 0.20; // 0, -1
-	q += Sample(id.xy - d.zx).xy * 0.05; // +1, -1
+	q += Sample(id.xy - d.yx).xy * 0.05; // +1, -1
 	q += Sample(id.xy - d.xz).xy * 0.20; // -1, 0
 	q += Sample(id.xy + d.xz).xy * 0.20; // +1, 0
-	q += Sample(id.xy + d.zx).xy * 0.05; // -1, +1
+	q += Sample(id.xy + d.yx).xy * 0.05; // -1, +1
 	q += Sample(id.xy + d.zx).xy * 0.20; // 0, +1
 	q += Sample(id.xy + d.xx).xy * 0.05; // +1, +1
 
