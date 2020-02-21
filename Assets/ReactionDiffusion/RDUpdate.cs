@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace ReactionDiffusion
@@ -13,6 +13,7 @@ namespace ReactionDiffusion
 
         [SerializeField]
         int _resolution = 512;
+	public int resolution { get; }
 
         [SerializeField]
         ComputeShader _compute;
